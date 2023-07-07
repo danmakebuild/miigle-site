@@ -112,6 +112,43 @@ async function filterCategories(filterCategoriesArray) {
 }
 
 
+
+// Filtering by targetMarkets
+const targetMarketFilters = document.getElementById("targetMarketFilters");
+targetMarketFilters.addEventListener("change", handleTargetMarketFilterChange);
+
+function handleTargetMarketFilterChange(event) {
+    
+  const targetMarketCheckboxes = targetMarketFilters.querySelectorAll('input[type="checkbox"]');
+    
+  const selectedTargetMarkets = Array.from(targetMarketCheckboxes)
+    .filter(checkbox => checkbox.checked)
+    .map(checkbox => checkbox.getAttribute("id"));
+    
+  const allTargetMarkets = Array.from(targetMarketCheckboxes)
+    .map(checkbox => checkbox.getAttribute("id"));
+
+if(selectedTargetMarkets.length < 1) {
+    filterTargetMarkets(allTargetMarkets);
+} else {
+  filterTargetMarkets(selectedTargetMarkets);
+}
+}
+
+async function filterTargetMarkets(filterTargetMarketsArray) {
+	try {
+  	await Wized.data.setVariable("branddirectoryskip", 0);
+  	var filterTargetMarketsStr = filterTargetMarketsArray.join(",");
+    await Wized.data.setVariable("branddirectoryfiltertargetmarkets", filterTargetMarketsStr);
+    console.log(filterTargetMarketsStr);
+    brandDirectoryPageTurn(0);
+    loadData();
+	} catch (error) {
+  	console.log(error);
+	}
+}
+
+
 // Filtering by badge
 const badgeFilters = document.getElementById("badgeFilters");
 badgeFilters.addEventListener("change", handleBadgeFilterChange);
@@ -240,6 +277,7 @@ function hideBrandDirectoryLoader(){
 window.addEventListener("load", async (event) => {
   const categoriesForFiltersResponse = await Wized.request.execute("Get all categories - filters");
   const badgesForFiltersResponse = await Wized.request.execute("Get all badges - filters");
+  const targetMarketsResponse = await Wized.request.execute("Get all target markets");
   checkForCategoryUrlParams();
 });
 
