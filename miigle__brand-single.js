@@ -81,7 +81,7 @@ async function getBrandSlugFromUrl() {
     const currentUrl = window.location.href;
 
     // Extract the portion after "/brand/" and before the "?"
-    const extractedValue = currentUrl.match(/\/brandx\/([^?]+)/)[1];
+    const extractedValue = currentUrl.match(/\/brand\/([^?]+)/)[1];
 
     return(extractedValue); // Output: patagonia
   } catch(error) {
