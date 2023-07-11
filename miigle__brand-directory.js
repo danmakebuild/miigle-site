@@ -2,6 +2,7 @@ let categories = [];
 
 async function loadData() {
   try {
+    console.log("loadData run");
 	  showBrandDirectoryLoader();
     const brandsResponse = await Wized.request.execute("Get all brands");
     //console.log(brandsResponse);
@@ -57,8 +58,15 @@ async function preparePagination() {
 }
 
 
-// Call the function when the page loads
-window.addEventListener('load', loadData);
+window.addEventListener("load", async (event) => {
+  const categoriesForFiltersResponse = await Wized.request.execute("Get all categories - filters");
+  console.log("categories loaded");
+  setTimeout(async function() {
+    await checkForCategoryUrlParams();
+  }, 1000);
+  const badgesForFiltersResponse = await Wized.request.execute("Get all badges - filters");
+  const targetMarketsResponse = await Wized.request.execute("Get all target markets");
+});
 
 function attachCategoriesToBrands(categories) {
   // loop through all elements with a category-id attribute
@@ -255,14 +263,19 @@ async function brandDirectoryPageTurn(skip) {
 }
 
 $(document).ready(function() {
-var brandDirectoryPerPage = 15;
+  var brandDirectoryPerPage = 15;
   $("#brandDirectoryPageNext").click(function() {
     brandDirectoryPageTurn(brandDirectoryPerPage);
   });
   $("#brandDirectoryPagePrev").click(function() {
     brandDirectoryPageTurn((brandDirectoryPerPage * -1));
   });
-  
+
+  $("#brand-search-submit--brand-directory").click(async function(){
+    showSearchResults();
+    updateQueryParam();
+    location.reload();
+  });
   document.getElementById("brand-search-submit--home").addEventListener("click", loadData);
 });
 
@@ -274,24 +287,19 @@ function hideBrandDirectoryLoader(){
 }
 
 
-window.addEventListener("load", async (event) => {
-  const categoriesForFiltersResponse = await Wized.request.execute("Get all categories - filters");
-  const badgesForFiltersResponse = await Wized.request.execute("Get all badges - filters");
-  const targetMarketsResponse = await Wized.request.execute("Get all target markets");
-  checkForCategoryUrlParams();
-});
 
-
-function checkForCategoryUrlParams() {
+async function checkForCategoryUrlParams() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
 
-  var hasSearchTerm = urlParams.has('*');
+  var hasSearchTerm = urlParams.has('q');
   var hasCategoryFilter = urlParams.has('category');
 
   if(hasSearchTerm === true) {	
     showSearchResults();
-    var searchTerm = urlParams.get('*');
+    await loadData();
+    // Query filtering is handled by Wized through URL parameter
+    var searchTerm = urlParams.get('q');
     $("#brand-search-field--brand-directory").val(searchTerm);
   }
 
@@ -299,6 +307,10 @@ function checkForCategoryUrlParams() {
     showSearchResults();
     var categoryFilter = urlParams.get('category').toLowerCase();
     clickCategoryFilter(categoryFilter);
+  }
+
+  if(hasSearchTerm === false && hasCategoryFilter === false) {
+    loadData();
   }
 }
 
@@ -313,20 +325,56 @@ for (const label of labelElements) {
 }
 }
 
-
 function showSearchResults() {
   $(".brand-directory").removeClass("hide");
   $(".discover-miigle__featured").addClass("hide");
 }
 
+// Add frame to featured brands
 $(".discover__featured__brands-list .featured-brand:nth-child(1)").find(".img-mask-frame").addClass("mask--blob");
 $(".discover__featured__brands-list .featured-brand:nth-child(2)").find(".img-mask-frame").addClass("mask--diamond");
 $(".discover__featured__brands-list .featured-brand:nth-child(3)").find(".img-mask-frame").addClass("mask--blob");
 $(".discover__featured__brands-list .featured-brand:nth-child(4)").find(".img-mask-frame").addClass("mask--flower");
 
-$("#brand-search-submit--brand-directory").click(function(){
-  showSearchResults();
-});
+// TODO: fix this so it works
+
+function updateQueryParam() {
+  // Get the value of the input element
+  var inputValue = document.getElementById('brand-search-field--brand-directory').value;
+
+  // Get the current URL
+  var url = window.location.href;
+
+  // Check if the URL already has a "q" parameter
+  if (url.indexOf('?') > -1) {
+    // URL has existing parameters
+    var urlParts = url.split('?');
+    var baseUrl = urlParts[0];
+    var params = urlParts[1].split('&');
+    var updatedParams = [];
+
+    // Loop through existing parameters and update "q" if found
+    for (var i = 0; i < params.length; i++) {
+      var param = params[i].split('=');
+      if (param[0] === 'q') {
+        updatedParams.push('q=' + encodeURIComponent(inputValue));
+      } else {
+        updatedParams.push(params[i]);
+      }
+    }
+
+    // Update the URL with the modified parameters
+    url = baseUrl + '?' + updatedParams.join('&');
+  } else {
+    // URL does not have any parameters
+    url += '?q=' + encodeURIComponent(inputValue);
+  }
+
+  // Update the browser URL
+  history.replaceState(null, null, url);
+}
+
+
 $(".brand__category__link-button").click(function(){
   showSearchResults();
 });
