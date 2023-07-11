@@ -296,11 +296,11 @@ async function checkForCategoryUrlParams() {
   var hasCategoryFilter = urlParams.has('category');
 
   if(hasSearchTerm === true) {	
-    showSearchResults();
-    await loadData();
     // Query filtering is handled by Wized through URL parameter
     var searchTerm = urlParams.get('q');
     $("#brand-search-field--brand-directory").val(searchTerm);
+    showSearchResults();
+    await loadData();
   }
 
   if(hasCategoryFilter === true) {
