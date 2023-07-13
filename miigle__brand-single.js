@@ -20,7 +20,7 @@ window.addEventListener('load', async () => {
       getFeaturedBrandsAndIds();
       await nestSubcategoriesInCategories();
       let bioText = $("div[w-el='brandBiography']");
-      let quote = $("div[w-el='quote']");
+      let quote = $("div[w-el='brandQuote']");
       parseMarkdownGeneral(bioText);
       parseMarkdownGeneral(quote);
     }, 100);
