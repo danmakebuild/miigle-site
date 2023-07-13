@@ -19,7 +19,10 @@ window.addEventListener('load', async () => {
       await sendAssetsToWized(assetsArray);
       getFeaturedBrandsAndIds();
       await nestSubcategoriesInCategories();
-      parseMarkdown();
+      let bioText = $("div[w-el='brandBiography']");
+      let quote = $("div[w-el='quote']");
+      parseMarkdownGeneral(bioText);
+      parseMarkdownGeneral(quote);
     }, 100);
 
   } catch (error) {
@@ -174,7 +177,8 @@ function updateBackgroundImagesFromAssetsObject(data) {
   }
 }
 
-function parseMarkdown() {
-  let bioText = $("div[w-el='brandBiography']").text()
-  $("div[w-el='brandBiography']").html(marked.parse(bioText));
+
+function parseMarkdownGeneral(elem) {
+  let rawContent = $(elem).text();
+  $(elem).html(marked.parse(rawContent));
 }

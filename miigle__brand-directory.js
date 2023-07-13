@@ -90,9 +90,7 @@ const categoryFilters = document.getElementById("categoryFilters");
 categoryFilters.addEventListener("change", handleCategoryFilterChange);
 
 function handleCategoryFilterChange(event) {
-    
   const categoryCheckboxes = categoryFilters.querySelectorAll('input[type="checkbox"]');
-    
   const selectedCategories = Array.from(categoryCheckboxes)
     .filter(checkbox => checkbox.checked)
     .map(checkbox => checkbox.getAttribute("id"));
@@ -118,8 +116,6 @@ async function filterCategories(filterCategoriesArray) {
   	console.log(error);
 	}
 }
-
-
 
 // Filtering by targetMarkets
 const targetMarketFilters = document.getElementById("targetMarketFilters");
