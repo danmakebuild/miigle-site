@@ -14,10 +14,13 @@ window.addEventListener('load', async () => {
   
     // Gallery
     const galleryArrayObject = singleBrandResponse.data.data.items[0].fields.gallery;
-    const galleryItemIds = await extractSysIds(galleryArrayObject);
-    await Wized.data.setVariable("brandgalleryassets", galleryItemIds);
-    const brandGalleryResponse = await Wized.request.execute("Get assets from ids (gallery)");
-    
+    if(galleryArrayObject.length > 0) { 
+      const galleryItemIds = await extractSysIds(galleryArrayObject);
+      await Wized.data.setVariable("brandgalleryassets", galleryItemIds);
+      const brandGalleryResponse = await Wized.request.execute("Get assets from ids (gallery)");
+    } else {
+        console.log("Empty gallery");
+    }
     
     async function extractSysIds(data) {
       const outputArray = [];
