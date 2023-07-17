@@ -6,10 +6,32 @@ window.addEventListener('load', async () => {
       await Wized.data.setVariable("brandslug", brandSlug);
     }
     const singleBrandResponse = await Wized.request.execute("Get a single brand");
-    //console.log(singleBrandResponse);
+    // console.log(singleBrandResponse);
     setMetadata(singleBrandResponse);
     const parentCategories = await Wized.request.execute("Get all categories");
     const subcategoriesResponse = await Wized.request.execute("Get subcategories from ids");
+    
+  
+    // Gallery
+    const galleryArrayObject = singleBrandResponse.data.data.items[0].fields.gallery;
+    const galleryItemIds = await extractSysIds(galleryArrayObject);
+    await Wized.data.setVariable("brandgalleryassets", galleryItemIds);
+    const brandGalleryResponse = await Wized.request.execute("Get assets from ids (gallery)");
+    
+    
+    async function extractSysIds(data) {
+      const outputArray = [];
+    
+      data.forEach((item) => {
+        if (item.sys && item.sys.id) {
+          outputArray.push(item.sys.id);
+        }
+      });
+    
+      return outputArray;
+    }
+
+
     setTimeout(async function() {
       $(".full-screen-loader").fadeOut();
       organiseCategoriesAndSubcategories(parentCategories);
