@@ -22,40 +22,7 @@ window.addEventListener('load', async () => {
       const brandGalleryResponse = await Wized.request.execute("Get assets from ids (gallery)");  
     }
 
-    // Hide media wrapper
-    async function isMediaAvailable(singleBrandResponse) {
-  let mediaIsAvailable;
-
-  if (
-    singleBrandResponse.data.data.items[0].fields.image === undefined &&
-    singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
-    singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
-    singleBrandResponse.data.data.items[0].fields.videoFile === undefined
-  ) {
-    mediaIsAvailable = false;
-  } else {
-    mediaIsAvailable = true;
-  }
-
-  if (mediaIsAvailable) {
-    if (singleBrandResponse.data.data.items[0].fields.featured === true) {
-      return true;
-    } else {
-      if (
-        singleBrandResponse.data.data.items[0].fields.image === undefined &&
-        singleBrandResponse.data.data.items[0].fields.gallery === undefined
-      ) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-  } else {
-    return false;
-  }
-}
-
-  await isMediaAvailable(singleBrandResponse);
+    await isMediaAvailable(singleBrandResponse);
 
     
     async function extractSysIds(data) {
@@ -243,3 +210,42 @@ function parseMarkdownGeneral(elem) {
   let rawContent = $(elem).text();
   $(elem).html(marked.parse(rawContent));
 }
+
+// Hide media wrapper
+    async function isMediaAvailable(singleBrandResponse) {
+    let mediaIsAvailable;
+
+    if (
+      singleBrandResponse.data.data.items[0].fields.image === undefined &&
+      singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
+      singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
+      singleBrandResponse.data.data.items[0].fields.gallery === undefined
+    ) {
+      mediaIsAvailable = false;
+    } else {
+      mediaIsAvailable = true;
+    }
+
+    if (mediaIsAvailable) {
+      if (singleBrandResponse.data.data.items[0].fields.featured === true) {
+        console.log("true");
+        return true;
+      } else {
+        if (
+          singleBrandResponse.data.data.items[0].fields.image === undefined &&
+          singleBrandResponse.data.data.items[0].fields.gallery === undefined
+        ) {
+          console.log("false");
+          $(".single-brand__media").hide();
+          return false;
+        } else {
+          console.log("true");
+          return true;
+        }
+      }
+    } else {
+      console.log("false");
+      $(".single-brand__media").hide();
+      return false;
+    }
+  }
