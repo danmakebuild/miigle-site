@@ -24,34 +24,36 @@ window.addEventListener('load', async () => {
 
     // Hide media wrapper
     async function isMediaAvailable(singleBrandResponse) {
-    let mediaIsAvailable;
+  let mediaIsAvailable;
 
-    if (
-      singleBrandResponse.data.data.items[0].fields.image === undefined &&
-      singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
-      singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
-      singleBrandResponse.data.data.items[0].fields.videoFile === undefined
-    ) {
-      mediaIsAvailable = false;
+  if (
+    singleBrandResponse.data.data.items[0].fields.image === undefined &&
+    singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
+    singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
+    singleBrandResponse.data.data.items[0].fields.videoFile === undefined
+  ) {
+    mediaIsAvailable = false;
+  } else {
+    mediaIsAvailable = true;
+  }
+
+  if (mediaIsAvailable) {
+    if (singleBrandResponse.data.data.items[0].fields.featured === true) {
+      return true;
     } else {
-      mediaIsAvailable = true;
-    }
-
-    if (mediaIsAvailable) {
-      if (singleBrandResponse.data.data.items[0].fields.featured === true) {
-        return true;
+      if (
+        singleBrandResponse.data.data.items[0].fields.image === undefined &&
+        singleBrandResponse.data.data.items[0].fields.gallery === undefined
+      ) {
+        return false;
       } else {
-        if (
-          singleBrandResponse.data.data.items[0].fields.image === undefined &&
-          singleBrandResponse.data.data.items[0].fields.gallery === undefined
-        ) {
-          return false;
-        }
+        return true;
       }
     }
-
-    return mediaIsAvailable;
+  } else {
+    return false;
   }
+}
 
   await isMediaAvailable(singleBrandResponse);
 
