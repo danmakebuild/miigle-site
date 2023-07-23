@@ -5,6 +5,7 @@ async function loadData() {
     console.log("loadData run");
 	  showBrandDirectoryLoader();
     const brandsResponse = await Wized.request.execute("Get all brands");
+    console.log(brandsResponse);
     //console.log(brandsResponse);
     const categoriesResponse = await Wized.request.execute("Get all categories");
     
@@ -22,6 +23,7 @@ async function loadData() {
 
     // Update the global categories array with the categories for the current page
     categories = pageCategories;
+    console.log(categories);
 
     // Call attachCategoriesToBrands after populating the categories array
     attachCategoriesToBrands(categories);
