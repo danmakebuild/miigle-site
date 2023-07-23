@@ -66,6 +66,7 @@ window.addEventListener("load", async (event) => {
   }, 1000);
   const badgesForFiltersResponse = await Wized.request.execute("Get all badges - filters");
   const targetMarketsResponse = await Wized.request.execute("Get all target markets");
+  const prepareCategoriesAndSubcategoriesResponse = await nestAndHideSubcategoryCheckboxes();
 });
 
 function attachCategoriesToBrands(categories) {
@@ -320,6 +321,59 @@ for (const label of labelElements) {
   }
 }
 }
+
+
+async function nestAndHideSubcategoryCheckboxes() {
+  // Get all elements with selector ".filter__checkbox-field.subcategory"
+  const subcategoryCheckboxes = document.querySelectorAll(".filter__checkbox-field.subcategory");
+
+  // Loop through each subcategory checkbox
+  subcategoryCheckboxes.forEach(function(subcategoryCheckbox) {
+    // Get the parentcategoryid attribute value
+    const parentCategoryId = subcategoryCheckbox.getAttribute("parentcategoryid");
+
+    // Find the corresponding ".filter__checkbox-category-wrap" with the same parentcategoryid
+    const correspondingWrap = document.querySelector(`.filter__checkbox-category-wrap[parentcategoryid="${parentCategoryId}"]`);
+
+    // If a corresponding wrap is found, nest the checkbox inside it and hide it
+    if (correspondingWrap) {
+      correspondingWrap.appendChild(subcategoryCheckbox);
+      subcategoryCheckbox.style.display = "none";
+    }
+  });
+
+  // Get all elements with selector "label[filter-type='category']"
+  const categoryLabels = document.querySelectorAll("label[filter-type='category']");
+
+  // Loop through each category label and add change event listener
+  categoryLabels.forEach(function(categoryLabel) {
+    // Get the checkbox inside the category label
+    const categoryCheckbox = categoryLabel.querySelector("input[type='checkbox']");
+
+    // Add change event listener to the category checkbox
+    categoryCheckbox.addEventListener("change", function() {
+      // Get all sibling subcategory labels
+      const subcategoryLabels = Array.from(categoryLabel.parentNode.querySelectorAll("label[filter-type='subcategory']"));
+
+      // Display the sibling subcategory checkboxes based on the state of the parent checkbox
+      subcategoryLabels.forEach(function(subcategoryLabel) {
+        subcategoryLabel.style.display = categoryCheckbox.checked ? "block" : "none";
+      });
+
+      // Set the sibling subcategory checkboxes to "checked" based on the state of the parent checkbox
+      const checkedState = categoryCheckbox.checked;
+      subcategoryLabels.forEach(function(subcategoryLabel) {
+        const subcategoryCheckbox = subcategoryLabel.querySelector("input[type='checkbox']");
+        subcategoryCheckbox.checked = checkedState;
+
+        // Dispatch the change event to trigger any associated listeners
+        const changeEvent = new Event("change", { bubbles: true, cancelable: true });
+        subcategoryCheckbox.dispatchEvent(changeEvent);
+      });
+    });
+  });
+}
+
 
 function showSearchResults() {
   $(".brand-directory").removeClass("hide");
