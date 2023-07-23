@@ -63,13 +63,13 @@ async function preparePagination() {
 window.addEventListener("load", async (event) => {
   const categoriesForFiltersResponse = await Wized.request.execute("Get all categories - filters");
   console.log("categories loaded");
-  const subcategoriesForFilterResponse = await Wized.request.execute("Get all subcategories");
-  console.log("subcategories loaded");
   setTimeout(async function() {
     await checkForCategoryUrlParams();
   }, 1000);
   const badgesForFiltersResponse = await Wized.request.execute("Get all badges - filters");
   const targetMarketsResponse = await Wized.request.execute("Get all target markets");
+  const subcategoriesForFilterResponse = await Wized.request.execute("Get all subcategories");
+  console.log("subcategories loaded");
   const prepareCategoriesAndSubcategoriesResponse = await nestAndHideSubcategoryCheckboxes();
 });
 
