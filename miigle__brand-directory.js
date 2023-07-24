@@ -70,7 +70,7 @@ window.addEventListener("load", async (event) => {
   const targetMarketsResponse = await Wized.request.execute("Get all target markets");
   const subcategoriesForFilterResponse = await Wized.request.execute("Get all subcategories");
   console.log("subcategories loaded");
-  const prepareCategoriesAndSubcategoriesResponse = await nestAndHideSubcategoryCheckboxes();
+  //const prepareCategoriesAndSubcategoriesResponse = await nestAndHideSubcategoryCheckboxes();
 });
 
 function attachCategoriesToBrands(categories) {
