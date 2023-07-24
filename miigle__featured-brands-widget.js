@@ -50,6 +50,7 @@ async function replaceImageSrc(featuredBrandEntries) {
   items.forEach(item => {
     const url = item.fields.file.url;
     const element = document.querySelector(`img[contentfulassetid="${item.sys.id}"]`);
+    console.log(`${item.sys.id}`);
     if (element) {
       element.src = url;
     }
