@@ -24,6 +24,8 @@ window.addEventListener('load', async () => {
 
     await showMediaWrapper(singleBrandResponse);
 
+    await hideFeaturedImageIfBlank();
+
     
     async function extractSysIds(data) {
       const outputArray = [];
@@ -182,6 +184,11 @@ async function sendAssetsToWized(assetsArray) {
   }
 }
 
+async function hideFeaturedImageIfBlank(singleBrandResponse) {
+  if(singleBrandResponse.data.data.items[0].fields.image === undefined) {
+    $(".single-brand__header__image").hide();
+  }
+}
 
 function updateBackgroundImagesFromAssetsObject(data) {
   const items = data.data.data.items; // Access the "items" array in the nested structure
