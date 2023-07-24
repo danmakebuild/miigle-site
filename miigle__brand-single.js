@@ -53,6 +53,8 @@ window.addEventListener('load', async () => {
       let quote = $("div[w-el='brandQuote']");
       parseMarkdownGeneral(bioText);
       parseMarkdownGeneral(quote);
+      $("div[w-el='brandQuote']").prepend("&quot;");
+      $("div[w-el='brandQuote']").append("&quot;");
     }, 100);
 
   } catch (error) {
