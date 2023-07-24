@@ -24,7 +24,7 @@ window.addEventListener('load', async () => {
 
     await showMediaWrapper(singleBrandResponse);
 
-    await hideFeaturedImageIfBlank();
+    await hideFeaturedImageIfBlank(singleBrandResponse);
 
     
     async function extractSysIds(data) {
