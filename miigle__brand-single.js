@@ -1,6 +1,7 @@
 window.addEventListener('load', async () => {
   // temp
   try {
+    const assetsArray = [];
     const brandSlug = await getBrandSlugFromUrl();
     if(brandSlug) {
       await Wized.data.setVariable("brandslug", brandSlug);
@@ -161,7 +162,7 @@ async function displayBrandStores(singleBrandResponse) {
 
 // Identify the IDs of any assets attached to this brand
 
-const assetsArray = [];
+
 
 function parseNestedAssets(data) {
 for (const key in data) {
