@@ -50,11 +50,11 @@ window.addEventListener('load', async () => {
       getFeaturedBrandsAndIds();
       await nestSubcategoriesInCategories();
       let bioText = $("div[w-el='brandBiography']");
-      let quote = $("div[w-el='brandQuote']");
       parseMarkdownGeneral(bioText);
-      parseMarkdownGeneral(quote);
-      $("div[w-el='brandQuote']").prepend("&quot;");
-      $("div[w-el='brandQuote']").append("&quot;");
+      await parseMarkdownGeneral(quote);
+      let quote = $("*[w-el='brandQuote']");
+      $(quote).prepend("&quot;");
+      $(quote).append("&quot;");
     }, 100);
 
   } catch (error) {
@@ -215,9 +215,9 @@ function updateBackgroundImagesFromAssetsObject(data) {
 }
 
 
-function parseMarkdownGeneral(elem) {
+async function parseMarkdownGeneral(elem) {
   let rawContent = $(elem).text();
-  $(elem).html(marked.parse(rawContent));
+  await $(elem).html(marked.parse(rawContent));
 }
 
 // Hide media wrapper
