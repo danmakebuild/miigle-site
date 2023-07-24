@@ -51,7 +51,6 @@ window.addEventListener('load', async () => {
       await nestSubcategoriesInCategories();
       let bioText = $("div[w-el='brandBiography']");
       parseMarkdownGeneral(bioText);
-      await parseMarkdownGeneral(quote);
       let quote = $("*[w-el='brandQuote']");
       $(quote).prepend("&quot;");
       $(quote).append("&quot;");
