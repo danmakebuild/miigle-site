@@ -215,7 +215,7 @@ function updateBackgroundImagesFromAssetsObject(data) {
 }
 
 
-async function parseMarkdownGeneral(elem) {
+async function parseMarkdown(elem) {
   let rawContent = $(elem).text();
   await $(elem).html(marked.parse(rawContent));
 }
