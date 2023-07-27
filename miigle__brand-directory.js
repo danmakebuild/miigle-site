@@ -68,9 +68,9 @@ window.addEventListener("load", async (event) => {
   }, 1000);
   const badgesForFiltersResponse = await Wized.request.execute("Get all badges - filters");
   const targetMarketsResponse = await Wized.request.execute("Get all target markets");
-  //const subcategoriesForFilterResponse = await Wized.request.execute("Get all subcategories");
-  //console.log("subcategories loaded");
-  //const prepareCategoriesAndSubcategoriesResponse = await nestAndHideSubcategoryCheckboxes();
+  const subcategoriesForFilterResponse = await Wized.request.execute("Get all subcategories");
+  console.log("subcategories loaded");
+  const prepareCategoriesAndSubcategoriesResponse = await nestAndHideSubcategoryCheckboxes();
 });
 
 function attachCategoriesToBrands(categories) {
