@@ -1,9 +1,73 @@
+// window.addEventListener('load', async () => {
+//   // temp
+//   try {
+//     const assetsArray = [];
+//     const brandSlug = await getBrandSlugFromUrl();
+//     if(brandSlug) {
+//       await Wized.data.setVariable("brandslug", brandSlug);
+//     }
+//     const singleBrandResponse = await Wized.request.execute("Get a single brand");
+//     // console.log(singleBrandResponse);
+//     setMetadata(singleBrandResponse);
+//     const parentCategories = await Wized.request.execute("Get all categories");
+//     const subcategoriesResponse = await Wized.request.execute("Get subcategories from ids");
+    
+  
+//     // Gallery
+//     const galleryArrayObject = singleBrandResponse.data.data.items[0].fields.gallery;
+//     if(galleryArrayObject === undefined) {
+//       console.log("Empty gallery");
+//     } else {
+//       const galleryItemIds = await extractSysIds(galleryArrayObject);
+//       await Wized.data.setVariable("brandgalleryassets", galleryItemIds);
+//       const brandGalleryResponse = await Wized.request.execute("Get assets from ids (gallery)");  
+//     }
+
+//     await showMediaWrapper(singleBrandResponse);
+
+//     await hideFeaturedImageIfBlank(singleBrandResponse);
+
+    
+//     async function extractSysIds(data) {
+//       const outputArray = [];
+    
+//       data.forEach((item) => {
+//         if (item.sys && item.sys.id) {
+//           outputArray.push(item.sys.id);
+//         }
+//       });
+    
+//       return outputArray;
+//     }
+
+
+//     setTimeout(async function() {
+//       $(".full-screen-loader").fadeOut();
+//       organiseCategoriesAndSubcategories(parentCategories);
+//       await displayPromotions(singleBrandResponse);
+//       await displayBrandStores(singleBrandResponse);
+//       parseNestedAssets(singleBrandResponse);
+//       await sendAssetsToWized(assetsArray);
+//       getFeaturedBrandsAndIds();
+//       await nestSubcategoriesInCategories();
+//       let bioText = $("div[w-el='brandBiography']");
+//       parseMarkdownGeneral(bioText);
+//       let quote = $("*[w-el='brandQuote']");
+//       $(quote).prepend("&quot;");
+//       $(quote).append("&quot;");
+//     }, 100);
+
+//   } catch (error) {
+//       console.log(error);
+//   }
+// });
+
 window.addEventListener('load', async () => {
   // temp
   try {
     const assetsArray = [];
     const brandSlug = await getBrandSlugFromUrl();
-    if(brandSlug) {
+    if (brandSlug) {
       await Wized.data.setVariable("brandslug", brandSlug);
     }
     const singleBrandResponse = await Wized.request.execute("Get a single brand");
@@ -11,56 +75,62 @@ window.addEventListener('load', async () => {
     setMetadata(singleBrandResponse);
     const parentCategories = await Wized.request.execute("Get all categories");
     const subcategoriesResponse = await Wized.request.execute("Get subcategories from ids");
-    
-  
+
+
     // Gallery
     const galleryArrayObject = singleBrandResponse.data.data.items[0].fields.gallery;
-    if(galleryArrayObject === undefined) {
+    if (galleryArrayObject === undefined) {
       console.log("Empty gallery");
     } else {
       const galleryItemIds = await extractSysIds(galleryArrayObject);
       await Wized.data.setVariable("brandgalleryassets", galleryItemIds);
-      const brandGalleryResponse = await Wized.request.execute("Get assets from ids (gallery)");  
+      const brandGalleryResponse = await Wized.request.execute("Get assets from ids (gallery)");
     }
 
     await showMediaWrapper(singleBrandResponse);
 
     await hideFeaturedImageIfBlank(singleBrandResponse);
 
-    
     async function extractSysIds(data) {
       const outputArray = [];
-    
+
       data.forEach((item) => {
         if (item.sys && item.sys.id) {
           outputArray.push(item.sys.id);
         }
       });
-    
+
       return outputArray;
     }
 
+    // Wait for all other asynchronous operations to complete before running this block of code
+    await Promise.all([
+      new Promise((resolve) => setTimeout(resolve, 100)), // Simulate a delay of 100 milliseconds
+      organiseCategoriesAndSubcategories(parentCategories),
+      displayPromotions(singleBrandResponse),
+      displayBrandStores(singleBrandResponse),
+      parseNestedAssets(singleBrandResponse),
+      sendAssetsToWized(assetsArray),
+      nestSubcategoriesInCategories(),
+    ]);
 
-    setTimeout(async function() {
-      $(".full-screen-loader").fadeOut();
-      organiseCategoriesAndSubcategories(parentCategories);
-      await displayPromotions(singleBrandResponse);
-      await displayBrandStores(singleBrandResponse);
-      parseNestedAssets(singleBrandResponse);
-      await sendAssetsToWized(assetsArray);
-      getFeaturedBrandsAndIds();
-      await nestSubcategoriesInCategories();
+    // Delayed execution for the following code snippets
+    setTimeout(() => {
       let bioText = $("div[w-el='brandBiography']");
       parseMarkdownGeneral(bioText);
       let quote = $("*[w-el='brandQuote']");
       $(quote).prepend("&quot;");
       $(quote).append("&quot;");
+
+      $(".full-screen-loader").fadeOut();
+      getFeaturedBrandsAndIds();
     }, 100);
 
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
 });
+
 
 function setMetadata(brandResponse) {
   const brandName = brandResponse.data.data.items[0].fields.name;
@@ -215,7 +285,7 @@ function updateBackgroundImagesFromAssetsObject(data) {
 }
 
 
-async function parseMarkdown(elem) {
+async function parseMarkdown (elem) {
   let rawContent = $(elem).text();
   await $(elem).html(marked.parse(rawContent));
 }
