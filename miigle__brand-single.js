@@ -1,11 +1,11 @@
 window.addEventListener('load', async () => {
   // temp
   try {
-    const assetsArray = [];
     const brandSlug = await getBrandSlugFromUrl();
     if(brandSlug) {
       await Wized.data.setVariable("brandslug", brandSlug);
     }
+    
     const singleBrandResponse = await Wized.request.execute("Get a single brand");
     // console.log(singleBrandResponse);
     setMetadata(singleBrandResponse);
@@ -39,16 +39,18 @@ window.addEventListener('load', async () => {
     
       return outputArray;
     }
-
-
+      
       $(".full-screen-loader").fadeOut();
       $("#brandQuotePaid").prepend(`"`);
       $("#brandQuotePaid").append(`"`);
+      $("#brandQuoteFree").prepend(`"`);
+      $("#brandQuoteFree").append(`"`);
       await organiseCategoriesAndSubcategories(parentCategories);
       await displayPromotions(singleBrandResponse);
       await displayBrandStores(singleBrandResponse);
-      //parseNestedAssets(singleBrandResponse);
-      //await sendAssetsToWized(assetsArray);
+      // const assetsArray = [];
+      // await parseNestedAssets(singleBrandResponse);
+      // await sendAssetsToWized(assetsArray);
       getFeaturedBrandsAndIds();
       await nestSubcategoriesInCategories();
 
@@ -157,7 +159,7 @@ async function displayBrandStores(singleBrandResponse) {
 
 
 // Identify the IDs of any assets attached to this brand
-function parseNestedAssets(data) {
+async function parseNestedAssets(data) {
 for (const key in data) {
   if (typeof data[key] === 'object' && data[key] !== null) {
     if (data[key].sys && data[key].sys.type === 'Link' && data[key].sys.linkType === 'Asset') {
@@ -216,24 +218,20 @@ async function parseMarkdownGeneral(elem) {
 // Hide media wrapper
     async function showMediaWrapper(singleBrandResponse) {
       if (singleBrandResponse.data.data.items[0].fields.featured === true) {
-        console.log("featured brand ✅");
-    if(singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
-      singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
-      singleBrandResponse.data.data.items[0].fields.gallery === undefined) {
-    } else {
-      console.log("✅ some media (excl. main image) has been defined");
-      $(".single-brand__media").show();
-    }
-}
-if (singleBrandResponse.data.data.items[0].fields.featured !== true) {
-        console.log("featured brand ❌");
-    if(singleBrandResponse.data.data.items[0].fields.image === undefined &&
-      singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
-      singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
-      singleBrandResponse.data.data.items[0].fields.gallery === undefined) {
-    } else {
-      console.log("✅ some media has been defined");
-        $(".single-brand__media").show();
-    }
-}
+        if(singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
+          singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
+          singleBrandResponse.data.data.items[0].fields.gallery === undefined) {
+        } else {
+          $(".single-brand__media").show();
+        }
+      }
+      if (singleBrandResponse.data.data.items[0].fields.featured !== true) {
+          if(singleBrandResponse.data.data.items[0].fields.image === undefined &&
+            singleBrandResponse.data.data.items[0].fields.videoFile === undefined &&
+            singleBrandResponse.data.data.items[0].fields.videoUrl === undefined &&
+            singleBrandResponse.data.data.items[0].fields.gallery === undefined) {
+          } else {
+              $(".single-brand__media").show();
+          }
+      }
   }

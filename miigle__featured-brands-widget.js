@@ -49,7 +49,7 @@ async function replaceImageSrc(featuredBrandEntries) {
   items.forEach(item => {
     const url = item.fields.file.url;
     const element = document.querySelector(`.discover-miigle__featured img[contentfulassetid="${item.sys.id}"]`);
-    console.log(`${item.sys.id}`);
+    // console.log(`${item.sys.id}`);
     if (element) {
       element.src = url;
     }
