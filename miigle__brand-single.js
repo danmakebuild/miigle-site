@@ -42,16 +42,15 @@ window.addEventListener('load', async () => {
 
 
       $(".full-screen-loader").fadeOut();
+      $("#brandQuotePaid").prepend(`"`);
+      $("#brandQuotePaid").append(`"`);
       await organiseCategoriesAndSubcategories(parentCategories);
       await displayPromotions(singleBrandResponse);
       await displayBrandStores(singleBrandResponse);
-      parseNestedAssets(singleBrandResponse);
-      await sendAssetsToWized(assetsArray);
+      //parseNestedAssets(singleBrandResponse);
+      //await sendAssetsToWized(assetsArray);
       getFeaturedBrandsAndIds();
       await nestSubcategoriesInCategories();
-      let quote = $("*[w-el='brandQuote']");
-      $(quote).prepend("&quot;");
-      $(quote).append("&quot;");
 
   } catch (error) {
       console.log(error);
@@ -158,9 +157,6 @@ async function displayBrandStores(singleBrandResponse) {
 
 
 // Identify the IDs of any assets attached to this brand
-
-
-
 function parseNestedAssets(data) {
 for (const key in data) {
   if (typeof data[key] === 'object' && data[key] !== null) {

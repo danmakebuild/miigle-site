@@ -1,11 +1,30 @@
 let categories = [];
 
-async function loadData() {
+async function loadData(selectedSubcategoryArray) {
   try {
     console.log("loadData run");
 	  showBrandDirectoryLoader();
-    const brandsResponse = await Wized.request.execute("Get all brands");
-    console.log(brandsResponse);
+
+  
+    if(selectedSubcategoryArray) {
+      console.log(selectedSubcategoryArray);
+      if (selectedSubcategoryArray.length > 0) {
+        const subcategoryFilterMode = await Wized.data.setVariable("subcategoryfiltermode", true);
+        console.log("subcat array longer than 0");
+        const brandsResponse = await Wized.request.execute("Get all brands (filtered by subcat)");
+        console.log(brandsResponse);
+      } else {
+        console.log("subcat array NOT longer than 0");
+        const subcategoryFilterMode = await Wized.data.setVariable("subcategoryfiltermode", false);
+        const brandsResponse = await Wized.request.execute("Get all brands");
+        console.log(brandsResponse);
+      }
+    } else {
+      const subcategoryFilterMode = await Wized.data.setVariable("subcategoryfiltermode", false);
+      const brandsResponse = await Wized.request.execute("Get all brands");
+      console.log(brandsResponse);
+    }
+    
     //console.log(brandsResponse);
     const categoriesResponse = await Wized.request.execute("Get all categories");
     
@@ -23,7 +42,6 @@ async function loadData() {
 
     // Update the global categories array with the categories for the current page
     categories = pageCategories;
-    console.log(categories);
 
     // Call attachCategoriesToBrands after populating the categories array
     attachCategoriesToBrands(categories);
@@ -68,9 +86,6 @@ window.addEventListener("load", async (event) => {
   }, 1000);
   const badgesForFiltersResponse = await Wized.request.execute("Get all badges - filters");
   const targetMarketsResponse = await Wized.request.execute("Get all target markets");
-  const subcategoriesForFilterResponse = await Wized.request.execute("Get all subcategories");
-  console.log("subcategories loaded");
-  const prepareCategoriesAndSubcategoriesResponse = await nestAndHideSubcategoryCheckboxes();
 });
 
 function attachCategoriesToBrands(categories) {
@@ -356,8 +371,9 @@ async function nestAndHideSubcategoryCheckboxes() {
 
     // Add change event listener to the category checkbox
     categoryCheckbox.addEventListener("change", function() {
-      // Get all sibling subcategory labels
-      const subcategoryLabels = Array.from(categoryLabel.parentNode.querySelectorAll("label[filter-type='subcategory']"));
+      // Get all sibling subcategory labels with matching parentcategoryid attribute
+      const parentCategoryId = categoryCheckbox.id;
+      const subcategoryLabels = document.querySelectorAll(`label[filter-type='subcategory'][parentcategoryid="${parentCategoryId}"]`);
 
       // Display the sibling subcategory checkboxes based on the state of the parent checkbox
       subcategoryLabels.forEach(function(subcategoryLabel) {
@@ -377,6 +393,7 @@ async function nestAndHideSubcategoryCheckboxes() {
     });
   });
 }
+
 
 
 function showSearchResults() {
@@ -435,3 +452,113 @@ $(".brand__category__link-button").click(function(){
 $(".discover-miigle__search__form__field").keyup(function(event) {
   showSearchResults();
 });
+
+
+async function onPageLoad() {
+  const subcategoriesForFilterResponse = await Wized.request.execute("Get all subcategories");
+  const subcatdata = subcategoriesForFilterResponse.data.data.items;
+  console.log(subcatdata);
+  //const allSubcategories = subcatdata.map(item => item.sys.id).join(',');
+  const allSubcategories = subcatdata.map(item => item.sys.id);
+
+  const selectedSubcategoryArray = [];
+
+
+  function createCheckboxesWithLabels() {
+    const outputDiv = document.getElementById('subcategoryFilters');
+    const groupedItems = groupItemsByParentCategoryId(subcatdata);
+  
+    groupedItems.forEach(group => {
+      const parentCategoryId = group[0].fields.parentCategory.sys.id; // Common parentCategoryId for the group
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('subcategory-wrapper');
+      wrapper.setAttribute('parentcategoryid', parentCategoryId); // Set parentcategoryid attribute
+      outputDiv.appendChild(wrapper);
+  
+      group.forEach(item => {
+        const name = item.fields.name;
+        const id = item.sys.id; // Extract the "id" attribute value from sys
+  
+        // Create the checkbox input
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+  
+        // Create the label for the checkbox
+        const label = document.createElement('label');
+        label.textContent = name;
+  
+        // Set the "for" attribute of the label to the unique checkbox id (inner wrapper id)
+        label.setAttribute('for', id);
+  
+        // Create a wrapper element for the checkbox and label
+        const itemWrapper = document.createElement('div');
+  
+        // Set the "id" attribute of the wrapper to the sys.id value
+        itemWrapper.setAttribute('id', id);
+        itemWrapper.classList.add('subcategory-single');
+  
+        // Append the checkbox and label to the wrapper
+        itemWrapper.appendChild(checkbox);
+        itemWrapper.appendChild(label);
+  
+        // Append the item wrapper to the group wrapper
+        wrapper.appendChild(itemWrapper);
+  
+        // Add event listener for change events on the checkbox
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            // Checkbox is checked, add the id to the selectedSubcategoryArray
+            selectedSubcategoryArray.push(id);
+          } else {
+            // Checkbox is unchecked, remove the id from the selectedSubcategoryArray
+            const index = selectedSubcategoryArray.indexOf(id);
+            if (index !== -1) {
+              selectedSubcategoryArray.splice(index, 1);
+            }
+          }
+  
+          // Remove blank items from the selectedSubcategoryArray
+          const filteredSelectedSubcategoryArray = selectedSubcategoryArray.filter(id => id !== "");
+  
+          console.log('Selected IDs:', filteredSelectedSubcategoryArray);
+          // Update the branddirectoryfiltersubcategories variable
+          updateSubcategoryArray(filteredSelectedSubcategoryArray);
+        });
+      });
+    });
+  }
+  
+
+  // Function to group items by parentCategoryId
+  function groupItemsByParentCategoryId(items) {
+    const groupedItems = [];
+    const map = new Map();
+    items.forEach(item => {
+      const parentCategoryId = item.fields.parentCategory.sys.id;
+      if (!map.has(parentCategoryId)) {
+        map.set(parentCategoryId, []);
+      }
+      map.get(parentCategoryId).push(item);
+    });
+    for (const [key, value] of map) {
+      groupedItems.push(value);
+    }
+    return groupedItems;
+  }
+
+  // Function to update the branddirectoryfiltersubcategories variable with a delay
+  let timeoutId;
+  async function updateSubcategoryArray(selectedSubcategoryArray) {
+    const subcategoryArray = await Wized.data.setVariable("branddirectoryfiltersubcategories", selectedSubcategoryArray);
+    clearTimeout(timeoutId); // Clear any previous timeout
+    timeoutId = setTimeout(async () => {
+      await loadData(selectedSubcategoryArray);
+    }, 500); // Add a delay of 500ms before calling loadData
+  }
+
+  // Call the function to create checkboxes with labels
+  createCheckboxesWithLabels();
+}
+
+// Call the async function on page load
+window.onload = onPageLoad;

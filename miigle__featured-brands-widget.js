@@ -1,5 +1,4 @@
 // This script is referenced inline inside the featured brands widget component
-
 // Get featured brands and ids
 async function getFeaturedBrandsAndIds() {
   try {
@@ -49,7 +48,7 @@ async function replaceImageSrc(featuredBrandEntries) {
   const items = featuredBrandEntries.data.data.items;
   items.forEach(item => {
     const url = item.fields.file.url;
-    const element = document.querySelector(`img[contentfulassetid="${item.sys.id}"]`);
+    const element = document.querySelector(`.discover-miigle__featured img[contentfulassetid="${item.sys.id}"]`);
     console.log(`${item.sys.id}`);
     if (element) {
       element.src = url;
